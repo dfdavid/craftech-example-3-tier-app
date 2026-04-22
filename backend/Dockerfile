@@ -1,34 +1,49 @@
-# ---------- STAGE 1: build ----------
+# stage 1: builder (instalacion de deps pesadas)
 FROM python:3.8.3-alpine AS builder
 
 WORKDIR /usr/src/app
 
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# herramientas de compilacion para psycopg2 y gunicorn
 RUN apk add --no-cache \
-    gcc libc-dev linux-headers postgresql-dev musl-dev zlib-dev
+    postgresql-client \
+    gcc \
+    libc-dev \
+    linux-headers \
+    postgresql-dev \
+    musl-dev \
+    zlib \
+    zlib-dev
 
-COPY requirements.txt .
+# instalacion en directorio local para copiar luego
+COPY ./requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir --prefix=/usr/local -r requirements.txt
 
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
-
-# ---------- STAGE 2: runtime ----------
+# stage 2: final (imagen liviana para ejecucion)
 FROM python:3.8.3-alpine
 
 WORKDIR /usr/src/app
 
-# evita que Python genere .pyc, reduce archivos innecesarios
-ENV PYTHONDONTWRITEBYTECODE=1  
-# mejora la visualizacion de logs evitando retrasos
+ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-RUN apk add --no-cache postgresql-client
+# solo las bibliotecas compartidas de runtime (livianas)
+RUN apk add --no-cache postgresql-client libpq zlib
 
-# copiar solo lo necesario desde builder
-COPY --from=builder /install /usr/local
+# copiar los paquetes de python compilados desde el builder
+COPY --from=builder /usr/local /usr/local
 
-COPY . .
+# configuracion de usuario no-root
+RUN adduser -D user
+RUN chown -R user:user /usr/src/app
 
-RUN adduser -D user && chown -r user:user /usr/src/app
+COPY --chown=user:user . .
+RUN chmod +x ./entrypoint.sh
+
 USER user
 
 ENTRYPOINT ["sh", "/usr/src/app/entrypoint.sh"]
