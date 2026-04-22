@@ -1,0 +1,12 @@
+.env
+.env.postgres
+.git
+.gitignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+db.sqlite3
+.pytest_cache
+node_modules
+docker-compose.yml
