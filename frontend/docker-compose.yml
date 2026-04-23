@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: test-app-frontend
+    container_name: frontend
+    ports:
+      - 3000:80
+    restart: always
