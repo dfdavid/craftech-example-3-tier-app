@@ -1,0 +1,38 @@
+@startuml
+
+actor Usuario
+participant Browser
+participant Nginx
+participant "Gunicorn (WSGI)" as Gunicorn
+participant "Django App" as Django
+participant Database
+
+Usuario -> Browser: Ingresa URL / acción HTTP
+Browser -> Nginx: HTTP Request (GET/POST)
+
+Nginx -> Nginx: Evalúa request (static? cache? routing)
+
+alt Request estático
+    Nginx -> Browser: Devuelve archivo estático
+else Request dinámico
+    Nginx -> Gunicorn: Forward request (WSGI)
+    
+    Gunicorn -> Django: Invoca aplicación (callable WSGI)
+    
+    Django -> Django: Middleware processing
+    Django -> Django: URL routing
+    Django -> Django: View logic
+    
+    Django -> Database: Query (ORM)
+    Database -> Django: Resultados
+    
+    Django -> Django: Render template / JSON
+    Django -> Gunicorn: Response HTTP
+    
+    Gunicorn -> Nginx: Response
+    Nginx -> Browser: HTTP Response
+end alt
+
+Browser -> Usuario: Renderiza respuesta
+
+@enduml
