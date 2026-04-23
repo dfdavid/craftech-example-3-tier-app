@@ -19,6 +19,7 @@ python manage.py migrate --no-input
 # si el comando recibido es el de inicio por defecto, ejecutar gunicorn
 if [ "$#" -eq 0 ]; then
     echo "Starting Gunicorn..."
+    # Gunicorn  recommends n° of workers: (2 x Host_CPU_cores) + 1
     exec gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 3
 fi
 
