@@ -1,9 +1,9 @@
 # stage 1: build
-FROM node:16-alpine AS build
+FROM node:lts-alpine3.22 AS build
 
 WORKDIR /usr/src/app
 
-# instalacion de dependencias (se copia package.json primero para aprovechar cache)
+# instalacion de dependencias
 COPY package.json package-lock.json* ./
 RUN npm install --silent
 
@@ -12,7 +12,7 @@ COPY . .
 RUN npm run build
 
 # stage 2: production
-FROM nginx:stable-alpine
+FROM nginx:stable-alpine-slim
 
 # copiar archivos compilados al directorio de nginx
 COPY --from=build /usr/src/app/build /usr/share/nginx/html
