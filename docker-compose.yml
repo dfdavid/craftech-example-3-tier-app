@@ -3,9 +3,10 @@ services:
     image: postgres:12.0-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    env_file:
-      - ./backend/.env.postgres
-      - ./backend/.env
+    environment:
+      - POSTGRES_DB=${DB_NAME:-postgres}
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
     networks:
       - backend_net
     restart: always
@@ -16,8 +17,13 @@ services:
     image: ${REGISTRY:-ghcr.io}/${IMAGE_NAME:-ddandrea/devops-interview-craftech}/backend:latest
     container_name: ct-backend
     hostname: backend
-    env_file:
-      - ./backend/.env
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_NAME=${DB_NAME:-postgres}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
     expose:
       - 8000
     depends_on:
@@ -32,8 +38,6 @@ services:
       context: ./frontend
       args:
         - REACT_APP_API_SERVER
-    env_file:
-      - ./frontend/.env
     image: ${REGISTRY:-ghcr.io}/${IMAGE_NAME:-ddandrea/devops-interview-craftech}/frontend:latest
     container_name: ct-frontend
     hostname: frontend
@@ -47,10 +51,11 @@ services:
     image: nginx:stable-alpine
     container_name: nginx-proxy
     hostname: nginx-proxy
-    env_file:
-      - .env
     environment:
       - TZ=America/Argentina/Buenos_Aires
+      - NGINX_FQDN=${NGINX_FQDN}
+      - NGINX_CERT=${NGINX_CERT:-certificado.crt}
+      - NGINX_KEY=${NGINX_KEY:-clave_privada.key}
     ports:
       - "80:80"
       - "443:443"
@@ -65,7 +70,6 @@ services:
     networks:
       - frontend_net
     restart: always
-
 
 networks:
   frontend_net:
