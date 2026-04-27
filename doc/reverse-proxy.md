@@ -1,7 +1,7 @@
 # reverse proxy - nginx con templates
 
 ## descripcion general
-el servicio de proxy reverso utiliza una imagen de nginx oficial configuradael uso de plantillas y variables de entorno. actua como punto unico de entrada para el trafico http (80) y https (443).
+el servicio de proxy reverso utiliza una imagen de nginx oficial configurada para el uso de plantillas y variables de entorno. actua como punto unico de entrada para el trafico http (80) y https (443).
 
 ## funcionamiento 
 el despliegue se basa en la funcionalidad nativa de la imagen oficial de nginx para procesar plantillas:
@@ -20,10 +20,11 @@ para agregar una nueva aplicacion al proxy:
 4. declarar las variables de entorno necesarias en el archivo `.env` de la raiz.
 
 ## ssl y seguridad
-el proxy esta configurado para forzar conexiones seguras:
-- el puerto 80 redirige automaticamente a https (301 moved permanently).
-- los certificados deben ubicarse en `./reverse-proxy/certs/`.
-- los nombres de los archivos de certificado y clave privada se configuran mediante `NGINX_CERT` y `NGINX_KEY` en el `.env`.
+el proxy esta configurado para forzar conexiones seguras y manejar certificados tls validos:
+
+- **redireccion automatica:** el puerto 80 redirige a https (301) y las peticiones http accidentales al puerto 443 son capturadas (error 497) y redirigidas a https.
+
+- **ubicacion:** los certificados deben copiarse a `./reverse-proxy/certs/` como `certificado.crt` y `clave_privada.key` respectivamente.
 
 ## logs
 los logs de acceso y error se persisten en `./reverse-proxy/logs/` para facilitar la auditoria y el troubleshooting sin necesidad de ingresar al contenedor.

@@ -25,8 +25,15 @@ al revisar su package.json, se observa el uso de react-scripts. esto confirma qu
    ```
 
 ## configuracion
-la conexion con el backend se configura en el archivo `src/config/constant.js`:
-- `API_SERVER`: define la url base de la api (por defecto `http://localhost:8000/api/`).
+la aplicacion se configura dinamicamente durante el proceso de construccion (build-time) mediante variables de entorno:
+
+- **archivo .env:** en la raiz del directorio `frontend/`, se debe definir `REACT_APP_API_SERVER`.
+  ```ini
+  # ejemplo para entorno con ssl
+  REACT_APP_API_SERVER=https://dominio.com/api/
+  ```
+- **docker build:** el `Dockerfile` utiliza el argumento `REACT_APP_API_SERVER` para inyectar la url de la api en el bundle estatico.
+- **desarrollo:** si no se define la variable, el sistema utiliza `http://localhost:8000/api/` como valor por defecto definido en `src/config/constant.js`.
 
 ## ejecucion
 - **desarrollo:** inicia el servidor local con recarga automatica.
