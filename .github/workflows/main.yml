@@ -45,6 +45,17 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
+
+      - name: Verify/Install Docker Compose Plugin
+        run: |
+          mkdir -p ~/.docker/cli-plugins/
+          if [ ! -f ~/.docker/cli-plugins/docker-compose ]; then
+            echo "installing docker compose plugin..."
+            curl -SL https://github.com/docker/compose/releases/download/v2.26.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+            chmod +x ~/.docker/cli-plugins/docker-compose
+          else
+            echo "docker compose plugin already installed."
+          fi
       
       - name: Log in to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
@@ -58,7 +69,7 @@ jobs:
             echo "NGINX_KEY=clave_privada.key" >> .env
           fi
           
-          # actualizar imagenes y reiniciar contenedores
+          # actualizar imagenes y reiniciar contenedores usando el plugin recien instalado
           docker compose pull
           docker compose up -d
           
