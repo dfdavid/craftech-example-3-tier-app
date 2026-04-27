@@ -1,9 +1,9 @@
 # reverse proxy - nginx con templates
 
 ## descripcion general
-el servicio de proxy reverso utiliza una imagen de nginx optimizada para entornos dinamicos mediante el uso de plantillas y variables de entorno. actua como punto unico de entrada para el trafico http (80) y https (443).
+el servicio de proxy reverso utiliza una imagen de nginx oficial configuradael uso de plantillas y variables de entorno. actua como punto unico de entrada para el trafico http (80) y https (443).
 
-## funcionamiento tecnico
+## funcionamiento 
 el despliegue se basa en la funcionalidad nativa de la imagen oficial de nginx para procesar plantillas:
 
 1. **directorio de plantillas**: los archivos ubicados en `./reverse-proxy/templates/*.template` son procesados al iniciar el contenedor.
