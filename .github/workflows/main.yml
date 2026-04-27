@@ -64,6 +64,15 @@ jobs:
       - name: Log in to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
+      - name: Sync Config to Host Volume
+        run: |
+          # Crear un volumen en el host para la configuracion
+          docker volume create craftech_proxy_config
+          
+          # Copiar archivos desde el sistema de archivos del runner al volumen del host
+          # Esto garantiza que el Docker del host tenga acceso a los archivos .conf y templates
+          docker run --rm -v craftech_proxy_config:/target -v $(pwd)/reverse-proxy:/source alpine cp -rf /source/. /target/
+
       - name: Pull and Restart Services
         env:
           NGINX_FQDN: ${{ secrets.NGINX_FQDN }}
@@ -72,10 +81,20 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
-          # docker compose ahora tomara las variables del entorno (env)
-          # sin necesidad de que existan archivos .env fisicos
-          docker compose pull
-          docker compose up -d
+          # Usamos un override temporal para que el compose use el volumen en lugar de rutas relativas
+          # Esto evita modificar el docker-compose.yml original
+          cat <<EOF > docker-compose.override.yml
+          services:
+            nginx-proxy:
+              volumes:
+                - craftech_proxy_config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+                - craftech_proxy_config/templates:/etc/nginx/templates:ro
+                - craftech_proxy_config/certs:/etc/nginx/certs:ro
+                - craftech_proxy_config/logs:/var/log/nginx
+          EOF
+
+          docker compose -f docker-compose.yml -f docker-compose.override.yml pull
+          docker compose -f docker-compose.yml -f docker-compose.override.yml up -d
           
-          # limpieza de imagenes antiguas
           docker image prune -f
+          rm docker-compose.override.yml
