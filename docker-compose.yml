@@ -13,7 +13,7 @@ services:
   backend:
     build:
       context: ./backend
-    image: ct-backend
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_NAME:-ddandrea/devops-interview-craftech}/backend:latest
     container_name: ct-backend
     hostname: backend
     env_file:
@@ -34,7 +34,7 @@ services:
         - REACT_APP_API_SERVER
     env_file:
       - ./frontend/.env
-    image: ct-frontend
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_NAME:-ddandrea/devops-interview-craftech}/frontend:latest
     container_name: ct-frontend
     hostname: frontend
     expose:
