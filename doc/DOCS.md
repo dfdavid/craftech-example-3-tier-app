@@ -1,21 +1,28 @@
 # technical blueprint - proyecto craftech
 
-## arquitectura de alto nivel
-el sistema utiliza un patron de arquitectura desacoplada. consiste en una single page application (spa) en el frontend y una interfaz de programacion de aplicaciones (api) rest en el backend. el flujo de datos principal se realiza mediante peticiones asincronicas seguras.
+## arquitectura de red y flujo de trafico
+el sistema utiliza un esquema de proxy inverso para centralizar el trafico y aislar los servicios internos.
 
 ```mermaid
-flowchart TD
-    subgraph Client [Client Side]
-        A[Frontend - React :3000]
+graph LR
+    subgraph "Public Internet"
+        User((Usuario))
     end
-
-    subgraph Server [Server Side]
-        B[Backend - Django Rest Framework :8000]
-        C[(Database - PostgreSQL :5432)]
+    
+    subgraph "Docker Network (frontend_net)"
+        Proxy[Gateway - Nginx :80]
+        Frontend[Frontend - Static :8080]
     end
-
-    A -->|"API REST (JSON/JWT)"| B
-    B -->|"ORM Django"| C
+    
+    subgraph "Docker Network (backend_net)"
+        Backend[Backend - Gunicorn :8000]
+        DB[(Database - PostgreSQL :5432)]
+    end
+    
+    User -->|HTTP 80| Proxy
+    Proxy -->|/| Frontend
+    Proxy -->|/api /admin| Backend
+    Backend -->|SQL| DB
 ```
 
 ## desglose de componentes
