@@ -9,6 +9,8 @@ RUN npm install --silent
 
 # copia del codigo fuente y compilacion
 COPY . .
+ARG REACT_APP_API_SERVER
+ENV REACT_APP_API_SERVER=$REACT_APP_API_SERVER
 RUN npm run build
 
 # stage 2: production

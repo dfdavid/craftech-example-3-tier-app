@@ -1,0 +1,53 @@
+
+services:
+  db:
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./backend/.env.postgres
+      - ./backend/.env
+    networks:
+      - backend_net
+    restart: always
+
+  backend:
+    build:
+      context: ./backend
+    image: ct-backend
+    container_name: ct-backend
+    hostname: backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    networks:
+      - backend_net
+      - frontend_net
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - REACT_APP_API_SERVER
+    env_file:
+      - ./frontend/.env
+    image: ct-frontend
+    container_name: ct-frontend
+    hostname: frontend
+    ports:
+      - "4000:8080"
+    networks:
+      - frontend_net
+    restart: always
+
+networks:
+  frontend_net:
+  backend_net:
+    internal: true
+
+volumes:
+  postgres_data:
