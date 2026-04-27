@@ -19,7 +19,7 @@ const DashDefault = () => {
               <div className="row align-items-center justify-content-center card-active" >
                 <div className="col-6">
                   <h4 className="text-center m-b-15">
-                    <span className="mb-0" style={{ color: "white" }}>App deployment progress: 100%</span>
+                    <span className="mb-0" style={{ color: "white" }}>app deployment progress: 100%</span>
                   </h4>
                   <div className="progress">
                     <div
