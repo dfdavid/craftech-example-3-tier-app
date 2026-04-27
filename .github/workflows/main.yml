@@ -66,8 +66,7 @@ jobs:
 
       - name: Build Temporary Proxy Config Image
         run: |
-          # Construimos una imagen local que ya contiene los archivos de configuracion.
-          # Esto evita que Docker intente montar archivos del sistema de archivos del runner (que el host no ve).
+          # Construimos la imagen local con la configuracion real
           docker build -t proxy-local:latest -f - . <<EOF
           FROM nginx:stable-alpine
           COPY ./reverse-proxy/nginx/nginx.conf /etc/nginx/nginx.conf
@@ -83,8 +82,11 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
-          # El override ahora usa la imagen local que construimos en el paso anterior.
-          # Eliminamos los 'volumes' para que no haya conflictos de montaje.
+          # 1. Pull solo del compose original (descarga imagenes remotas de GHCR/DockerHub)
+          # Aqui se descargan Backend, Frontend y DB. Nginx-proxy bajara la imagen base oficial.
+          docker compose -f docker-compose.yml pull
+
+          # 2. Generar override para usar la imagen local de configuracion
           cat <<EOF > docker-compose.override.yml
           services:
             nginx-proxy:
@@ -92,8 +94,9 @@ jobs:
               volumes: []
           EOF
 
-          docker compose -f docker-compose.yml -f docker-compose.override.yml pull
+          # 3. Levantar servicios combinando el original y el override
           docker compose -f docker-compose.yml -f docker-compose.override.yml up -d
           
+          # 4. Limpieza
           docker image prune -f
           rm docker-compose.override.yml
