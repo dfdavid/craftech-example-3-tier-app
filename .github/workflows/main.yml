@@ -64,14 +64,16 @@ jobs:
       - name: Log in to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Sync Config to Host Volume
+      - name: Build Temporary Proxy Config Image
         run: |
-          # Crear un volumen en el host para la configuracion
-          docker volume create craftech_proxy_config
-          
-          # Copiar archivos desde el sistema de archivos del runner al volumen del host
-          # Esto garantiza que el Docker del host tenga acceso a los archivos .conf y templates
-          docker run --rm -v craftech_proxy_config:/target -v $(pwd)/reverse-proxy:/source alpine cp -rf /source/. /target/
+          # Construimos una imagen local que ya contiene los archivos de configuracion.
+          # Esto evita que Docker intente montar archivos del sistema de archivos del runner (que el host no ve).
+          docker build -t proxy-local:latest -f - . <<EOF
+          FROM nginx:stable-alpine
+          COPY ./reverse-proxy/nginx/nginx.conf /etc/nginx/nginx.conf
+          COPY ./reverse-proxy/templates /etc/nginx/templates
+          COPY ./reverse-proxy/certs /etc/nginx/certs
+          EOF
 
       - name: Pull and Restart Services
         env:
@@ -81,16 +83,13 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
-          # Usamos un override temporal para que el compose use el volumen en lugar de rutas relativas
-          # Esto evita modificar el docker-compose.yml original
+          # El override ahora usa la imagen local que construimos en el paso anterior.
+          # Eliminamos los 'volumes' para que no haya conflictos de montaje.
           cat <<EOF > docker-compose.override.yml
           services:
             nginx-proxy:
-              volumes:
-                - craftech_proxy_config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-                - craftech_proxy_config/templates:/etc/nginx/templates:ro
-                - craftech_proxy_config/certs:/etc/nginx/certs:ro
-                - craftech_proxy_config/logs:/var/log/nginx
+              image: proxy-local:latest
+              volumes: []
           EOF
 
           docker compose -f docker-compose.yml -f docker-compose.override.yml pull
