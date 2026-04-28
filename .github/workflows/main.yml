@@ -69,24 +69,26 @@ jobs:
         env:
           # Nginx Proxy
           NGINX_FQDN: ${{ secrets.NGINX_FQDN }}
-          NGINX_CERT: ${{ secrets.NGINX_CERT }}
-          NGINX_KEY: ${{ secrets.NGINX_KEY }}
+          NGINX_CERT: ${{ secrets.NGINX_CERT || 'certificado.crt' }}
+          NGINX_KEY: ${{ secrets.NGINX_KEY || 'clave_privada.key' }}
           NGINX_CERT_CONTENT: ${{ secrets.NGINX_CERT_CONTENT }}
           NGINX_KEY_CONTENT: ${{ secrets.NGINX_KEY_CONTENT }}
           # Frontend
           REACT_APP_API_SERVER: ${{ secrets.REACT_APP_API_SERVER }}
           # Backend
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          DEBUG: ${{ secrets.DEBUG }}
-          DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
+          DEBUG: ${{ secrets.DEBUG || '0' }}
+          DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS || '*' }}
           CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}
           CSRF_TRUSTED_ORIGINS: ${{ secrets.CSRF_TRUSTED_ORIGINS }}
-          # Database
+          # Database (Traduccion de nombres de GitHub a nombres de Proyecto)
           DATABASE: postgres
-          SQL_ENGINE: ${{ secrets.SQL_ENGINE }}
-          SQL_DATABASE: ${{ secrets.SQL_DATABASE }}
-          SQL_USER: ${{ secrets.SQL_USER }}
-          SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
+          SQL_ENGINE: django.db.backends.postgresql
+          SQL_DATABASE: ${{ secrets.DB_NAME }}
+          SQL_USER: ${{ secrets.DB_USER }}
+          SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          SQL_HOST: ${{ secrets.DB_HOST || 'db' }}
+          SQL_PORT: ${{ secrets.DB_PORT || '5432' }}
         run: |
           docker compose pull
           docker compose up -d
