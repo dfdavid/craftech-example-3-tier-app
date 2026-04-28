@@ -165,12 +165,18 @@ USE_X_FORWARDED_PORT = True
 # Django 4.0+ requiere esta configuracion para peticiones HTTPS seguras
 CSRF_TRUSTED_ORIGINS = os.getenv(
     "CSRF_TRUSTED_ORIGINS", "https://localhost https://127.0.0.1"
-).split(" ")
+).replace(",", " ").split()
 
-# Opcional: Asegurar cookies solo via HTTPS si estamos en produccion
+# Configuracion de Cookies para produccion
+CSRF_COOKIE_HTTPONLY = False  # Permitir que el frontend lea el token si es necesario
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
+
 if not DEBUG:
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
+    # Confiar en el encabezado X-Forwarded-Proto enviado por Nginx
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # ##################################################################### #
 # ################### TESTING           ############################### #
