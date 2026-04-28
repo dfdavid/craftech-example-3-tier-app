@@ -30,7 +30,7 @@ graph TD
 | componente | responsabilidad tecnica | comunicacion |
 | :--- | :--- | :--- |
 | frontend | gestion de interfaz y estado global (redux). | fqdn (https) |
-| backend | logica de negocio y autenticacion jwt. | orm puerto 5432 |
+| backend | logica de negocio y autenticacion jwt. | puerto 8000 |
 | database | persistencia de datos relacionales (volumen persistente). | puerto 5432 |
 | nginx-proxy | terminacion ssl/tls y ruteo de peticiones. | puertos 80, 443 |
 
