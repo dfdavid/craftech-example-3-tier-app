@@ -27,8 +27,8 @@ services:
       - DATABASE=${DATABASE}
       - SQL_ENGINE=${SQL_ENGINE}
       - SQL_DATABASE=${SQL_DATABASE}
-      - SQL_USER=${SQL_USER}
-      - SQL_PASSWORD=${SQL_PASSWORD}
+      - SQL_USER=${SQL_USER:-user}
+      - SQL_PASSWORD=${SQL_PASSWORD:-password}
       - SQL_HOST=${SQL_HOST}
       - SQL_PORT=${SQL_PORT}
     expose:
