@@ -5,9 +5,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=${SQL_DATABASE}
-      - POSTGRES_USER=${SQL_USER}
-      - POSTGRES_PASSWORD=${SQL_PASSWORD}
+      - POSTGRES_DB=${SQL_DATABASE:-core}
+      - POSTGRES_USER=${SQL_USER:-user}
+      - POSTGRES_PASSWORD=${SQL_PASSWORD:-password}
     networks:
       - backend_net
     restart: always
