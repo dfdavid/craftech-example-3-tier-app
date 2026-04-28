@@ -24,12 +24,13 @@ services:
       - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-*}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
       - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS}
-      - SQL_ENGINE=${SQL_ENGINE}
-      - SQL_DATABASE=${SQL_DATABASE}
-      - SQL_USER=${SQL_USER}
-      - SQL_PASSWORD=${SQL_PASSWORD}
-      - SQL_HOST=db
-      - SQL_PORT=5432
+      - DATABASE=${DATABASE:-postgres}
+      - SQL_ENGINE=${SQL_ENGINE:-django.db.backends.postgresql}
+      - SQL_DATABASE=${SQL_DATABASE:-core}
+      - SQL_USER=${SQL_USER:-user}
+      - SQL_PASSWORD=${SQL_PASSWORD:-password}
+      - SQL_HOST=${SQL_HOST:-db}
+      - SQL_PORT=${SQL_PORT:-5432}
     expose:
       - 8000
     depends_on:
