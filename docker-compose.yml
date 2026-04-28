@@ -63,6 +63,8 @@ services:
       - NGINX_FQDN=${NGINX_FQDN}
       - NGINX_CERT=${NGINX_CERT:-certificado.crt}
       - NGINX_KEY=${NGINX_KEY:-clave_privada.key}
+      - NGINX_CERT_CONTENT=${NGINX_CERT_CONTENT}
+      - NGINX_KEY_CONTENT=${NGINX_KEY_CONTENT}
     ports:
       - "80:80"
       - "443:443"

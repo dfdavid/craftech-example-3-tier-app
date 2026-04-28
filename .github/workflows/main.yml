@@ -71,6 +71,8 @@ jobs:
           NGINX_FQDN: ${{ secrets.NGINX_FQDN }}
           NGINX_CERT: ${{ secrets.NGINX_CERT }}
           NGINX_KEY: ${{ secrets.NGINX_KEY }}
+          NGINX_CERT_CONTENT: ${{ secrets.NGINX_CERT_CONTENT }}
+          NGINX_KEY_CONTENT: ${{ secrets.NGINX_KEY_CONTENT }}
           # Frontend
           REACT_APP_API_SERVER: ${{ secrets.REACT_APP_API_SERVER }}
           # Backend
